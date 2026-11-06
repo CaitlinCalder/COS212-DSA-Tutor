@@ -1,4 +1,4 @@
-# Part 4 — Quests (Khotso)
+# Part 4 — Quests (Khotso + Bafana)
 
 Owns: the three-stage quest screens.
 
