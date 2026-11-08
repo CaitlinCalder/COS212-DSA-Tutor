@@ -1,5 +1,5 @@
 
-# Part 3 — Sandbox + Graph/Queue Visual (Kelita)
+# Part 3 - Sandbox + Graph/Queue Visual (Kelita)
 
 ## Overview
 
