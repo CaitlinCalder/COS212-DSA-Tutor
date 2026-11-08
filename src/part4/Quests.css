@@ -1,0 +1,355 @@
+.quests-page {
+  --quest-ink: #17324d;
+  --quest-muted: #5e7082;
+  --quest-accent: #1d6b66;
+  --quest-border: #d7e1e8;
+  color: var(--quest-ink);
+  margin: 0 auto;
+  max-width: 1280px;
+  padding: 32px 24px 56px;
+}
+
+.quests-page * {
+  box-sizing: border-box;
+}
+
+.quests-header,
+.quest-title-row {
+  align-items: flex-start;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+}
+
+.quests-header h1,
+.quest-title-row h2 {
+  margin: 4px 0 8px;
+}
+
+.quests-header > div > p:last-child,
+.quest-title-row > div > p:last-child {
+  color: var(--quest-muted);
+  margin: 0;
+  max-width: 680px;
+}
+
+.quest-eyebrow {
+  color: var(--quest-accent);
+  font-size: 0.76rem;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.quest-progress {
+  background: #eaf3f1;
+  border-radius: 12px;
+  display: grid;
+  gap: 6px;
+  max-width: 245px;
+  padding: 16px;
+}
+
+.quest-progress span,
+.quest-variant,
+.quest-picker__item > span:last-child,
+.quest-hint-note {
+  color: var(--quest-muted);
+  font-size: 0.88rem;
+}
+
+.quest-picker {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  margin: 26px 0;
+}
+
+.quest-picker__item {
+  align-items: flex-start;
+  background: #fff;
+  border: 1px solid var(--quest-border);
+  border-radius: 10px;
+  color: var(--quest-ink);
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+  padding: 13px;
+  text-align: left;
+}
+
+.quest-picker__item:hover,
+.quest-picker__item.is-active {
+  border-color: var(--quest-accent);
+  box-shadow: 0 0 0 2px #1d6b661c;
+}
+
+.quest-picker__skill {
+  color: var(--quest-accent);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.quest-workspace {
+  align-items: start;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) 280px;
+}
+
+.quest-main,
+.quest-side {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.quest-title-row {
+  align-items: center;
+}
+
+.quest-variant {
+  background: #f0f4f6;
+  border-radius: 999px;
+  flex: 0 0 auto;
+  padding: 8px 12px;
+}
+
+.quest-stage-list {
+  color: var(--quest-muted);
+  counter-reset: stage;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.quest-stage-list li {
+  align-items: center;
+  background: #f2f5f7;
+  border-radius: 8px;
+  display: flex;
+  font-size: 0.9rem;
+  gap: 9px;
+  min-height: 48px;
+  padding: 8px 12px;
+}
+
+.quest-stage-list li > span {
+  align-items: center;
+  background: #fff;
+  border-radius: 50%;
+  display: inline-flex;
+  flex: 0 0 26px;
+  font-weight: 700;
+  height: 26px;
+  justify-content: center;
+}
+
+.quest-stage-list li.is-active {
+  background: #e4f0ee;
+  color: var(--quest-ink);
+  font-weight: 700;
+}
+
+.quest-stage-list li.is-done > span {
+  background: var(--quest-accent);
+  color: white;
+}
+
+.quest-card {
+  background: white;
+  border: 1px solid var(--quest-border);
+  border-radius: 14px;
+  min-width: 0;
+  padding: 20px;
+}
+
+.quest-card h3 {
+  margin: 0 0 12px;
+}
+
+.quest-walkthrough {
+  background: #f0f7f6;
+  border-left: 4px solid var(--quest-accent);
+  border-radius: 4px;
+  line-height: 1.55;
+  margin: 0 0 16px;
+  min-height: 52px;
+  padding: 12px 14px;
+}
+
+.quest-options {
+  display: grid;
+  gap: 9px;
+  margin: 16px 0;
+}
+
+.quest-option {
+  background: #fff;
+  border: 1px solid var(--quest-border);
+  border-radius: 8px;
+  color: var(--quest-ink);
+  cursor: pointer;
+  line-height: 1.45;
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.quest-option:hover,
+.quest-option.is-selected {
+  border-color: var(--quest-accent);
+  box-shadow: 0 0 0 2px #1d6b661c;
+}
+
+.quest-option.is-selected {
+  background: #f0f7f6;
+}
+
+.quest-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.quest-button {
+  background: white;
+  border: 1px solid #aebdc8;
+  border-radius: 8px;
+  color: var(--quest-ink);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 650;
+  min-height: 40px;
+  padding: 9px 13px;
+}
+
+.quest-button:hover:not(:disabled) {
+  border-color: var(--quest-accent);
+}
+
+.quest-button--primary {
+  background: var(--quest-accent);
+  border-color: var(--quest-accent);
+  color: #fff;
+}
+
+.quest-button--primary:hover:not(:disabled) {
+  background: #145651;
+  color: white;
+}
+
+.quest-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.quest-feedback {
+  background: #fff5e8;
+  border: 1px solid #efd6b1;
+  border-radius: 9px;
+  line-height: 1.5;
+  margin-top: 14px;
+  padding: 13px 15px;
+}
+
+.quest-feedback p {
+  margin: 5px 0 0;
+}
+
+.quest-feedback.is-correct {
+  background: #edf7f0;
+  border-color: #bfdfc9;
+}
+
+.quest-feedback.is-incorrect {
+  background: #fff5e8;
+}
+
+.quest-hints {
+  background: #f4f7f9;
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 12px 12px 12px 34px;
+}
+
+.quest-hints li {
+  padding-left: 4px;
+}
+
+.quest-hints li span {
+  color: var(--quest-accent);
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.quest-hint-note {
+  margin: 12px 0 0;
+}
+
+.quest-side .quest-card > p:not(.quest-eyebrow),
+.quest-side__rules li {
+  color: var(--quest-muted);
+  line-height: 1.5;
+}
+
+.quest-side__note {
+  border-top: 1px solid var(--quest-border);
+  margin: 16px 0 0;
+  padding-top: 14px;
+}
+
+.quest-side__rules ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.quest-step-count {
+  color: var(--quest-muted);
+  font-size: 0.88rem;
+}
+
+.quest-complete {
+  background: #f1f8f6;
+}
+
+@media (max-width: 860px) {
+  .quest-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .quest-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .quests-page {
+    padding: 22px 14px 36px;
+  }
+
+  .quests-header,
+  .quest-title-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .quest-stage-list {
+    grid-template-columns: 1fr;
+  }
+
+  .quest-side {
+    grid-template-columns: 1fr;
+  }
+}

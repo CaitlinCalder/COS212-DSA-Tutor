@@ -1,14 +1,8 @@
-import { SKILL_ORDER } from "./shared/types";
+import Quests from "./part4/Quests";
 
 /**
- * Placeholder app shell. Part 5 (Mbusi) owns the real navigation, tree,
- * report, and lecturer view. This exists so the scaffold builds and runs.
+ * Temporary preview entry point until Part 5 integrates quests into the app shell.
  */
 export function App() {
-  return (
-    <main>
-      <h1>COS212 BFS Tutor</h1>
-      <p>Skills: {SKILL_ORDER.join(", ")}</p>
-    </main>
-  );
+  return <Quests />;
 }
