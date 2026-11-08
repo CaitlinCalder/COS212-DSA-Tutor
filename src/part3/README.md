@@ -5,7 +5,7 @@
 
 Part 3 provides an interactive **Graph Sandbox** and reusable graph and queue visualisation components for the BFS learning application.
 
-The Sandbox allows learners to build town networks, explore graph structures, visualise Breadth-First Search (BFS), and find shortest routes. The shared components and algorithms can also be used by **Part 4** to support its learning activities.
+The Sandbox allows learners to build town networks, explore graph structures, visualise BFS, and find shortest routes. The shared components and algorithms can also be used by **Part 4** to support its learning activities.
 
 ### Features
 
