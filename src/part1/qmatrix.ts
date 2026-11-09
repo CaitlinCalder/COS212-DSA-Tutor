@@ -30,3 +30,8 @@ export const diagnosticQMatrix: QMatrix = buildQMatrix(
   diagnosticItems,
 );
 
+
+//lookup the Q-matrix for a bank (only the diagnostic bank exists in this prototype)
+export function qMatrixFor(_bank: QuizBankId): QMatrix {
+  return diagnosticQMatrix;
+}

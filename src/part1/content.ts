@@ -1,10 +1,10 @@
 //Content & Assessment banks for the COS212 BFS Tutor
 //For AI Log: Used claude to generate questions and answers to create single and multi-attribute questions
 
-import type { QuizItem, LearningOutcome, AlignmentRow } from "../shared/types";
+import type { QuizItem } from "../shared/types";
 import { SKILL_ORDER } from "../shared/types";
 //for questions requiring graphs
-import {adjacencyListText,graphA2Diag,graphA2Recheck,graphA4Diag,graphA4Recheck,graphA5Diag1,graphA5Diag2,graphA5Diag3,graphA5Recheck1,graphA5Recheck2,graphA5Recheck3,graphA6Diag1,graphA6Recheck1,} from "./graphs";
+import { adjacencyListText, graphA2Diag, graphA4Diag, graphA5Diag1, graphA5Diag2, graphA5Diag3, graphA6Diag1 } from "./graphs";
 
 export { SKILL_ORDER };
 export { adjacencyListText };

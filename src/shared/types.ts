@@ -68,3 +68,35 @@ export interface QMatrix {
 }
 
 
+
+//part 2: personalisation & data types 
+//one student answer; selectedOptionId is null when skipped
+export interface QuizResponse {
+  itemId: string;
+  selectedOptionId: string | null;
+}
+
+//per-skill NPC result; correct/total kept for display + the fallback scorer
+export interface SkillResult {
+  skill: SkillId;
+  mastered: boolean;
+  correct: number;
+  total: number;
+}
+
+//returned by diagnosis: the six-skill mastery vector plus per-skill results
+export interface DiagnosisResponse {
+  bank: QuizBankId;
+  mastery: Record<SkillId, boolean>;
+  results: SkillResult[];
+}
+
+//four-state model; `confirmed` is only reachable via a re-check 
+export type SkillState = "unknown" | "tentative" | "confirmed" | "missing";
+
+export interface SkillProfile {
+  states: Record<SkillId, SkillState>;
+  diagnostic?: SkillResult[];
+  recheck?: SkillResult[];
+  updatedAt: number;
+}
