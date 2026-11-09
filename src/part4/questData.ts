@@ -1,0 +1,211 @@
+import type { SkillId } from "../shared/types";
+import type { QuestChallenge, QuestDefinition, QuestVariant } from "./questTypes";
+
+const challenge = (
+  prompt: string,
+  options: string[],
+  answer: string,
+  explanation: string,
+  hints: [string, string, string],
+  extras: Pick<QuestChallenge, "queue" | "highlightedRoute" | "routeDestination" | "feedbackReplayStep"> = {},
+): QuestChallenge => ({
+  prompt,
+  options,
+  answer,
+  explanation,
+  hints,
+  ...extras,
+});
+
+const variant = (
+  id: string,
+  vertices: string[],
+  edges: { from: string; to: string }[],
+  directed: boolean,
+  start: string,
+  walkthrough: string[],
+  guided: QuestChallenge,
+  independent: QuestChallenge,
+): QuestVariant => ({
+  id,
+  graph: { vertices, edges, directed },
+  start,
+  walkthrough,
+  guided,
+  independent,
+});
+
+export const QUESTS: Record<SkillId, QuestDefinition> = {
+  A1: {
+    skillId: "A1",
+    title: "Map the town",
+    district: "Old Town",
+    learningGoal: "Recognise vertices, edges, neighbours, and edge direction.",
+    variants: [
+      variant(
+        "a1-river",
+        ["A", "B", "C"],
+        [{ from: "A", to: "B" }, { from: "B", to: "C" }],
+        true,
+        "A",
+        ["Each circle is a vertex: a town in the network.", "Each arrow is an edge: a road with a direction.", "A neighbour is reachable in one edge, following the arrow."],
+        challenge("On this one-way map, can a messenger travel from B to A along the road shown?", ["Yes, the road works both ways", "No, the arrow only points from A to B"], "No, the arrow only points from A to B", "A directed edge A → B permits travel from A to B, not from B back to A.", ["Look at the arrowhead.", "The road points away from A.", "A → B does not also create B → A." ]),
+        challenge("What does the arrow from B to C tell you?", ["B and C are connected both ways", "Travel is allowed from B to C"], "Travel is allowed from B to C", "The arrow is a directed edge from B to C.", ["Find the arrowhead.", "It points toward C.", "The direction is B → C." ]),
+      ),
+      variant(
+        "a1-market",
+        ["M", "N", "P"],
+        [{ from: "N", to: "M" }, { from: "P", to: "N" }],
+        true,
+        "P",
+        ["M, N, and P are vertices (towns).", "The arrows are directed edges (one-way roads).", "Follow each arrow to decide which towns are neighbours in that direction."],
+        challenge("Is M a neighbour you can reach directly from N?", ["Yes, N has a road to M", "No, the road only goes from M to N"], "Yes, N has a road to M", "The edge is N → M, so M is a neighbour reachable from N.", ["Check where the arrow starts.", "It starts at N.", "N → M reaches M directly." ]),
+        challenge("Can a traveller go from N to P in one step?", ["Yes, because the towns share an edge", "No, the arrow goes from P to N"], "No, the arrow goes from P to N", "A directed edge cannot be followed backwards; this road is P → N.", ["Read the arrow direction.", "The arrow starts at P.", "Only P → N is allowed." ]),
+      ),
+    ],
+  },
+  A2: {
+    skillId: "A2",
+    title: "Read the registry",
+    district: "Registry Row",
+    learningGoal: "Read an adjacency list and identify a vertex's neighbours.",
+    variants: [
+      variant(
+        "a2-harbour",
+        ["H", "I", "J", "K"],
+        [{ from: "H", to: "I" }, { from: "H", to: "J" }, { from: "J", to: "K" }],
+        false,
+        "H",
+        ["An adjacency list has one entry for each vertex.", "The names beside a vertex are its direct neighbours.", "Do not include towns that are only reachable by taking another road."],
+        challenge("Which towns belong in H's adjacency-list entry?", ["I and J", "I, J, and K", "J and K"], "I and J", "H has direct roads to I and J. K is connected through J, not directly to H.", ["Only count one road away.", "Follow edges touching H.", "H's neighbours are I and J." ]),
+        challenge("A town is two roads from H. Should it appear in H's adjacency list?", ["Yes, every reachable town appears", "No, only direct neighbours appear"], "No, only direct neighbours appear", "Adjacency lists record direct neighbours, not every town reachable by a longer route.", ["Think about what one list entry represents.", "A neighbour takes one edge.", "A two-edge destination is not listed directly." ]),
+      ),
+      variant(
+        "a2-hill",
+        ["L", "M", "N", "O"],
+        [{ from: "L", to: "M" }, { from: "L", to: "O" }, { from: "M", to: "N" }],
+        false,
+        "L",
+        ["The graph is undirected, so each road can be followed either way.", "List only vertices joined directly to the chosen vertex.", "Use the same direct-road rule to build an adjacency list from a map."],
+        challenge("What is the neighbour list for L?", ["M and O", "M, N, and O", "N and O"], "M and O", "L touches M and O. N is one road beyond M.", ["Find the edges touching L.", "There are roads L—M and L—O.", "So the list is M, O." ]),
+        challenge("If M's entry includes N, does that make N a neighbour of L?", ["Yes, because N is in M's list", "No, L and N have no direct road"], "No, L and N have no direct road", "Neighbourhood is direct: L is two edges from N, so N is not in L's adjacency list.", ["Look for an edge from L to N.", "There is no direct edge.", "N is not a neighbour of L." ]),
+      ),
+    ],
+  },
+  A3: {
+    skillId: "A3",
+    title: "The ticket line",
+    district: "Station Square",
+    learningGoal: "Use a first-in, first-out queue correctly.",
+    variants: [
+      variant(
+        "a3-station",
+        ["A", "B", "C"],
+        [{ from: "A", to: "B" }, { from: "B", to: "C" }],
+        false,
+        "A",
+        ["A queue is first in, first out (FIFO).", "The person at the front has waited longest.", "Remove from the front; new arrivals join at the back."],
+        challenge("The line is shown front-to-back as A, B, C. Who is served next?", ["A", "B", "C"], "A", "A is at the front, so the earliest arrival is served first.", ["Find the front of the line.", "The first item is removed.", "A is served next." ], { queue: ["A", "B", "C"] }),
+        challenge("A is served, leaving B, C. Which ticket is now at the front?", ["B", "C", "A"], "B", "After removing A from the front, B becomes the next item.", ["Remove A from the list.", "The remaining queue begins with B.", "B is next out." ], { queue: ["B", "C"] }),
+      ),
+      variant(
+        "a3-clinic",
+        ["D", "E", "F"],
+        [{ from: "D", to: "E" }, { from: "E", to: "F" }],
+        false,
+        "D",
+        ["The clinic desk serves patients in arrival order.", "New patients join the back of the queue.", "FIFO means the first person in is the first person out."],
+        challenge("Patients arrived D, then E, then F. Who is served first?", ["F", "D", "E"], "D", "D arrived first and is still at the front of the queue.", ["Arrival order is queue order.", "The front is the first arrival.", "D is served first." ], { queue: ["D", "E", "F"] }),
+        challenge("After D leaves, a new patient G joins behind E and F. Who is next?", ["E", "F", "G"], "E", "Removing from the front leaves E first; G joins at the back.", ["Do not remove from the back.", "E is still at the front.", "E is next out." ], { queue: ["E", "F", "G"] }),
+      ),
+    ],
+  },
+  A4: {
+    skillId: "A4",
+    title: "The messenger",
+    district: "Message Mile",
+    learningGoal: "Follow BFS: enqueue, dequeue, visit neighbours, and mark discovered vertices.",
+    variants: [
+      variant(
+        "a4-square",
+        ["A", "B", "C", "D"],
+        [{ from: "A", to: "B" }, { from: "A", to: "C" }, { from: "B", to: "D" }],
+        false,
+        "A",
+        ["Start by enqueueing A and marking it discovered.", "Dequeue A, visit it, then enqueue its unvisited neighbours.", "Repeat from the front of the queue; mark a town when enqueued."],
+        challenge("A has been dequeued and visited. Its neighbours B and C are new. What happens next?", ["Enqueue B and C, marking them discovered", "Visit every town immediately", "Put A back in the queue"], "Enqueue B and C, marking them discovered", "BFS adds each newly discovered neighbour to the queue and marks it so it is not enqueued again.", ["New neighbours wait their turn.", "The queue receives B and C.", "Mark them discovered as you enqueue them." ], { queue: ["B", "C"], feedbackReplayStep: 3 }),
+        challenge("B is now at the front; C is waiting. What is the next BFS operation?", ["Dequeue C", "Dequeue B and visit it", "Enqueue A again"], "Dequeue B and visit it", "BFS removes the front item B, visits it, then checks B's neighbours.", ["Use FIFO order.", "B is at the front.", "Dequeue and visit B." ], { queue: ["B", "C"] }),
+      ),
+      variant(
+        "a4-garden",
+        ["G", "H", "I", "J"],
+        [{ from: "G", to: "H" }, { from: "H", to: "I" }, { from: "H", to: "J" }],
+        false,
+        "G",
+        ["Enqueue the start G and mark it discovered.", "Dequeue and visit G; enqueue its new neighbour H.", "Next dequeue H and enqueue its undiscovered neighbours I and J."],
+        challenge("H has just been visited. I and J are both undiscovered neighbours. What should BFS do?", ["Enqueue I and J, marking each discovered", "Visit J immediately and skip the queue", "Put H back at the front"], "Enqueue I and J, marking each discovered", "BFS enqueues both new neighbours. They will be visited later in queue order.", ["BFS processes one queue item at a time.", "New neighbours wait in the queue.", "Enqueue I and J and mark them discovered." ], { queue: ["I", "J"], feedbackReplayStep: 7 }),
+        challenge("The queue is [I, J]. Which town is dequeued next?", ["J", "I", "G"], "I", "A FIFO queue removes I because it entered the queue before J.", ["Look at the front of the queue.", "I is before J.", "Dequeue I." ], { queue: ["I", "J"] }),
+      ),
+    ],
+  },
+  A5: {
+    skillId: "A5",
+    title: "Predict the spread",
+    district: "Signal Hill",
+    learningGoal: "Predict and trace BFS visit order from a starting vertex.",
+    variants: [
+      variant(
+        "a5-bridge",
+        ["A", "B", "C", "D", "E"],
+        [{ from: "A", to: "B" }, { from: "A", to: "C" }, { from: "B", to: "D" }, { from: "C", to: "E" }],
+        false,
+        "A",
+        ["BFS starts at A.", "Visit A's neighbours before exploring any of their neighbours.", "The sorted-neighbour rule in this app gives a repeatable order when towns are tied."],
+        challenge("Starting from A, predict the visit order. The app considers neighbours alphabetically.", ["A, B, C, D, E", "A, B, D, C, E", "A, C, E, B, D"], "A, B, C, D, E", "A is visited first, then its neighbours B and C; then D and E are visited.", ["Start with A.", "Enqueue B and C before exploring either.", "The visit order is A, B, C, D, E." ], { feedbackReplayStep: 14 }),
+        challenge("Starting from A, which BFS visit order is correct?", ["A, B, D, C, E", "A, B, C, D, E", "A, C, B, E, D"], "A, B, C, D, E", "B and C are both one edge from A, so both are visited before the vertices two edges away.", ["Group by distance from A.", "B and C are distance one.", "Visit order: A, B, C, D, E." ]),
+      ),
+      variant(
+        "a5-loop",
+        ["P", "Q", "R", "S"],
+        [{ from: "P", to: "Q" }, { from: "P", to: "R" }, { from: "Q", to: "R" }, { from: "R", to: "S" }],
+        false,
+        "P",
+        ["Begin at P and enqueue its neighbours Q and R.", "When Q is explored, R is already discovered, so it is not added a second time.", "Continue from R to reach S."],
+        challenge("Starting from P and sorting neighbours alphabetically, what is the visit order?", ["P, Q, R, S", "P, R, S, Q", "P, Q, S, R"], "P, Q, R, S", "Q and R are enqueued from P. When Q connects to R, R is already discovered; then R leads to S.", ["P's neighbours are Q and R.", "Both are visited before S.", "The order is P, Q, R, S." ], { feedbackReplayStep: 14 }),
+        challenge("What is the complete visit order from P?", ["P, R, Q, S", "P, Q, R, S", "P, Q, S, R"], "P, Q, R, S", "BFS visits P, then its queued neighbours Q and R, then S.", ["Check the queue after visiting P.", "Q is ahead of R alphabetically.", "Then visit R and finally S." ]),
+      ),
+    ],
+  },
+  A6: {
+    skillId: "A6",
+    title: "Fewest hops",
+    district: "Crossroads",
+    learningGoal: "Find a route with the fewest edges and explain why discovered towns must not be queued twice.",
+    variants: [
+      variant(
+        "a6-circle",
+        ["A", "B", "C", "D"],
+        [{ from: "A", to: "B" }, { from: "B", to: "D" }, { from: "A", to: "C" }, { from: "C", to: "D" }, { from: "B", to: "C" }],
+        false,
+        "A",
+        ["A cycle can lead back to a town already seen.", "Mark a town discovered as soon as it is enqueued.", "BFS explores by edge-count layers, so its first route to a destination uses the fewest edges."],
+        challenge("Which route from A to D uses the fewest roads?", ["A → B → D", "A → B → C → D", "A → C → B → D"], "A → B → D", "A → B → D uses two edges; the other listed routes use three.", ["Count edges, not towns.", "The direct choices through B or C each use two.", "A → B → D is a shortest route." ], { routeDestination: "D", feedbackReplayStep: 9 }),
+        challenge("Why mark a town discovered when it is enqueued?", ["So a cycle cannot enqueue it repeatedly", "So it is visited before the queue front", "So the graph becomes directed"], "So a cycle cannot enqueue it repeatedly", "Marking at enqueue time prevents duplicate queue entries when cycles or multiple routes lead to the same town.", ["Imagine two roads lead to the same town.", "Check discovery before adding to the queue.", "Mark it immediately so it is enqueued only once." ]),
+      ),
+      variant(
+        "a6-fork",
+        ["K", "L", "M", "N", "O"],
+        [{ from: "K", to: "L" }, { from: "L", to: "M" }, { from: "M", to: "O" }, { from: "K", to: "N" }, { from: "N", to: "O" }, { from: "L", to: "N" }],
+        false,
+        "K",
+        ["There may be several routes to the same destination.", "BFS checks nearer towns before more distant ones.", "The first time O is reached gives a route with the fewest edges."],
+        challenge("Which route from K to O has the fewest edges?", ["K → L → M → O", "K → N → O", "K → L → N → O"], "K → N → O", "The route through N takes two roads. The other options take three.", ["Count the edges in each route.", "The route through N uses two.", "K → N → O is shortest." ], { routeDestination: "O", feedbackReplayStep: 14 }),
+        challenge("L and N both connect toward O. How should BFS avoid adding N to the queue twice?", ["Mark N discovered the first time it is enqueued", "Wait until N is dequeued before recording it", "Remove the edge between L and N"], "Mark N discovered the first time it is enqueued", "Marking at enqueue time means another path cannot add an already-discovered vertex again.", ["A vertex can be reached from multiple places.", "Check its discovered state before enqueueing.", "Mark N when first added to the queue." ]),
+      ),
+    ],
+  },
+};
+
+export function getQuest(skillId: SkillId): QuestDefinition {
+  return QUESTS[skillId];
+}
