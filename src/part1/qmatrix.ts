@@ -1,7 +1,7 @@
 //A Q-matrix maps assessment items (rows) to the skills they use (columns)
 import type { QMatrix, SkillId, QuizItem, QuizBankId } from "../shared/types";
 import { SKILL_ORDER } from "../shared/types";
-import { diagnosticItems } from "./content";
+import { diagnosticItems, recheckItems } from "./content";
 
 //building the QMatrix for a bank from its quiz items.
 export function buildQMatrix(bank: QuizBankId, items: QuizItem[]): QMatrix {
@@ -30,8 +30,10 @@ export const diagnosticQMatrix: QMatrix = buildQMatrix(
   diagnosticItems,
 );
 
+//Q-matrix for the re-check bank
+export const recheckQMatrix: QMatrix = buildQMatrix("recheck", recheckItems);
 
-//lookup the Q-matrix for a bank (only the diagnostic bank exists in this prototype)
-export function qMatrixFor(_bank: QuizBankId): QMatrix {
-  return diagnosticQMatrix;
+//lookup the Q-matrix for a bank
+export function qMatrixFor(bank: QuizBankId): QMatrix {
+  return bank === "recheck" ? recheckQMatrix : diagnosticQMatrix;
 }
