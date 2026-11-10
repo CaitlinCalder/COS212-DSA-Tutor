@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { diagnosticItems } from "../part1/content";
+import { diagnosticItems, recheckItems } from "../part1/content";
 import Quests from "../part4/Quests";
 import { getQuest } from "../part4/questData";
 import type { DiagnosisResponse, QuizResponse, SkillId, SkillProfile } from "../shared/types";
@@ -13,6 +13,7 @@ import { primarySkill } from "../shared/types";
 import {
   completeQuest,
   getQuestPlan,
+  recheckItemIds,
   runDiagnostic,
   runRecheck,
 } from "./journey";
@@ -25,6 +26,19 @@ function responsesForSkill(skill?: SkillId | null): QuizResponse[] {
         ? item.correctOptionId
         : "incorrect-option",
   }));
+}
+
+// Answers only the recheck items the journey would actually ask (gap skills),
+// getting `correctSkill`'s items right and the rest wrong.
+function recheckResponses(profile: SkillProfile, correctSkill: SkillId): QuizResponse[] {
+  const asked = new Set(recheckItemIds(profile));
+  return recheckItems
+    .filter((item) => asked.has(item.id))
+    .map((item) => ({
+      itemId: item.id,
+      selectedOptionId:
+        primarySkill(item) === correctSkill ? item.correctOptionId : "incorrect-option",
+    }));
 }
 
 function failDiagnosis(): DiagnosisResponse {
@@ -105,12 +119,14 @@ describe("Part 1 → Part 2 → Part 4 journey contract", () => {
     expect(screen.getByTestId("planned-skills").textContent).toBe("A2,A3,A4,A5,A6");
     expect(screen.getByText(/progress is tentative/i)).toBeTruthy();
 
-    const rechecked = runRecheck(
-      profile!,
-      responsesForSkill(null),
-      responsesForSkill("A1"),
-      { diagnoseFn: failDiagnosis },
-    );
+    // Only gap skills (tentative A1 + missing A2..A6) are re-asked, from the recheck bank.
+    const askedIds = recheckItemIds(profile!);
+    expect(askedIds.length).toBeGreaterThan(0);
+    expect(askedIds.every((id) => id.startsWith("r-"))).toBe(true);
+
+    const rechecked = runRecheck(profile!, recheckResponses(profile!, "A1"), {
+      diagnoseFn: failDiagnosis,
+    });
 
     expect(rechecked.states.A1).toBe("confirmed");
     expect(rechecked.states.A2).toBe("missing");
