@@ -25,6 +25,7 @@ import {
 import type { BfsStep, GraphModel, VertexId } from "../shared/types";
 import GraphQueueView from "./GraphQueueView";
 import type { GraphPosition, GraphTool } from "./GraphQueueView";
+import SandboxIntro from "./SandboxIntro";
 
 import {
   addEdge,
@@ -43,12 +44,16 @@ import "./GraphSandbox.css";
 
 const DEFAULT_GRAPH: GraphModel = {
   directed: false,
-  vertices: ["A", "B", "C", "D", "E"],
+  vertices: ["A", "B", "C", "D", "E", "F", "G"],
   edges: [
     { from: "A", to: "B" },
     { from: "A", to: "C" },
     { from: "B", to: "D" },
-    { from: "C", to: "E" },
+    { from: "C", to: "D" },
+    { from: "C", to: "F" },
+    { from: "D", to: "E" },
+    { from: "E", to: "G" },
+    { from: "F", to: "G" },
   ],
 };
 
@@ -110,7 +115,8 @@ export default function GraphSandbox({
 }: GraphSandboxProps) {
   const [graph, setGraph] = useState(() => copyGraph(initialGraph));
 
-  const [mode, setMode] = useState<Mode>("build");
+  // Start in Explore so the student sees BFS working straight away, then lets them build their own.
+  const [mode, setMode] = useState<Mode>("explore");
   const [tool, setTool] = useState<GraphTool>("select");
   const [editor, setEditor] = useState<Editor>(null);
 
@@ -552,6 +558,8 @@ export default function GraphSandbox({
           </div>
         </header>
 
+        <SandboxIntro mode={mode} />
+
         <div className="sandbox-modes">
           <div
             className="sandbox-mode-buttons"
@@ -675,6 +683,11 @@ export default function GraphSandbox({
                         : "No town selected"}
                     </span>
                   </div>
+
+                  <p className="sandbox-panel-help">
+                    <strong>Add Town</strong>, then click empty space on the map. <strong>Connect</strong>, then click
+                    two towns to join them with a road. <strong>Move / Select</strong> lets you drag towns around.
+                  </p>
 
                   <div className="sandbox-toolbar">
                     <button
@@ -973,6 +986,11 @@ export default function GraphSandbox({
                       {steps.length}
                     </span>
                   </div>
+
+                  <p className="sandbox-panel-help">
+                    Pick a starting town, then press <strong>Next Step</strong> to move one operation at a time, or{" "}
+                    <strong>Run All</strong> to watch it play. <strong>Previous</strong> steps back.
+                  </p>
 
                   <div className="sandbox-playback-controls">
                     <label className="sandbox-start-field">
