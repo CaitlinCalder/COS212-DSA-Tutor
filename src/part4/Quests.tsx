@@ -4,6 +4,8 @@ import { SKILL_ORDER, type SkillId } from "../shared/types";
 import GraphQueueView from "../part3/GraphQueueView";
 import { getQuest } from "./questData";
 import type { QuestChallenge, QuestCompletion, QuestPlan } from "./questTypes";
+import {NarrationControls,ReadView,TryItView,ViewPreferencePicker,ViewSwitcher,} from "./RepresentationViews";
+import {DEFAULT_VIEW_MODE,loadViewPreference,narrationFor,saveViewPreference,type ViewMode,} from "./representations";
 import "./Quests.css";
 
 type Stage = "watch" | "guided" | "independent" | "complete";
@@ -134,6 +136,15 @@ export default function Quests({ questPlan = DEFAULT_PLAN, onQuestComplete }: Qu
   const [guidedReplayStep, setGuidedReplayStep] = useState(0);
   const [variantIndices, setVariantIndices] = useState<Record<string, number>>({});
   const [completedSkills, setCompletedSkills] = useState<Set<SkillId>>(() => new Set());
+  const [storedPreference] = useState(() => loadViewPreference());
+  const [viewMode, setViewMode] = useState<ViewMode>(storedPreference ?? DEFAULT_VIEW_MODE);
+  const [preferenceAnswered, setPreferenceAnswered] = useState(storedPreference !== null);
+
+  function chooseViewMode(mode: ViewMode) {
+    setViewMode(mode);
+    saveViewPreference(mode);
+    setPreferenceAnswered(true);
+  }
 
   const selection = selections.find((item) => item.id === selectedId) ?? firstSelection;
   const quest = selection ? getQuest(selection.skillId) : null;
@@ -275,6 +286,10 @@ export default function Quests({ questPlan = DEFAULT_PLAN, onQuestComplete }: Qu
         </aside>
       </header>
 
+      {!preferenceAnswered && (
+        <ViewPreferencePicker onChoose={chooseViewMode} onSkip={() => setPreferenceAnswered(true)} />
+      )}
+
       <nav className="quest-picker" aria-label="Choose a quest">
         {selections.map((item) => {
           const itemQuest = getQuest(item.skillId);
@@ -322,16 +337,46 @@ export default function Quests({ questPlan = DEFAULT_PLAN, onQuestComplete }: Qu
             <section className="quest-card">
               <p className="quest-eyebrow">Worked example · {walkthroughStep + 1} of {walkthrough.length}</p>
               <h3>Watch the decision, then try it yourself.</h3>
+              <ViewSwitcher mode={viewMode} onChange={chooseViewMode} />
               <p className="quest-walkthrough" aria-live="polite">{walkthrough[walkthroughStep]}</p>
-              <GraphQueueView
-                graph={currentVariant.graph}
-                steps={showBfsTrace ? bfsSteps : []}
-                currentStep={showBfsTrace ? exampleStepIndex : -1}
-                title={`${quest.district} network`}
-                readOnly
-                highlightedRoute={getHighlightedRoute(currentVariant.guided)}
-                queue={quest.skillId === "A3" ? currentVariant.guided.queue : undefined}
-              />
+              {(viewMode === "see" || viewMode === "hear") && (
+                <>
+                  {viewMode === "hear" && (
+                    <NarrationControls
+                      text={narrationFor(
+                        walkthrough[walkthroughStep] ?? "",
+                        showBfsTrace ? bfsSteps[exampleStepIndex] : undefined,
+                      )}
+                    />
+                  )}
+                  <GraphQueueView
+                    graph={currentVariant.graph}
+                    steps={showBfsTrace ? bfsSteps : []}
+                    currentStep={showBfsTrace ? exampleStepIndex : -1}
+                    title={`${quest.district} network`}
+                    readOnly
+                    highlightedRoute={getHighlightedRoute(currentVariant.guided)}
+                    queue={quest.skillId === "A3" ? currentVariant.guided.queue : undefined}
+                  />
+                </>
+              )}
+              {viewMode === "read" && (
+                <ReadView
+                  graph={currentVariant.graph}
+                  steps={bfsSteps}
+                  currentStep={showBfsTrace ? exampleStepIndex : -1}
+                  queue={quest.skillId === "A3" ? currentVariant.guided.queue : undefined}
+                />
+              )}
+              {viewMode === "do" && (
+                <TryItView
+                  key={`${selection.id}-${currentVariant.id}`}
+                  graph={currentVariant.graph}
+                  steps={bfsSteps}
+                  useTrace={showBfsTrace}
+                  title={`${quest.district} network`}
+                />
+              )}
               <div className="quest-actions">
                 {walkthroughStep < walkthrough.length - 1 ? (
                   <button className="quest-button quest-button--primary" type="button" onClick={() => setWalkthroughStep((step) => step + 1)}>

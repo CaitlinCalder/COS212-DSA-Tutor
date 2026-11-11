@@ -174,7 +174,6 @@ export default function AppShell() {
   const [active, setActive] = useState<ViewId>("video");
   const [profile, setProfile] = useState<SkillProfile>(() => startJourney());
   const [initialProfile, setInitialProfile] = useState<SkillProfile | null>(null);
-  const [diagnosticResponses, setDiagnosticResponses] = useState<QuizResponse[]>([]);
   const [recheckProfile, setRecheckProfile] = useState<SkillProfile | null>(null);
   const [slideFiles, setSlideFiles] = useState<File[]>([]);
   const [draggingSlides, setDraggingSlides] = useState(false);
@@ -212,7 +211,6 @@ export default function AppShell() {
 
   function submitDiagnostic(responses: QuizResponse[]) {
     const next = runDiagnostic(responses);
-    setDiagnosticResponses(responses);
     setProfile(next);
     setInitialProfile(next);
     setRecheckProfile(null);
@@ -225,7 +223,7 @@ export default function AppShell() {
 
   function submitRecheck(responses: QuizResponse[]) {
     if (!initialProfile) return;
-    const next = runRecheck(profile, diagnosticResponses, responses);
+    const next = runRecheck(profile, responses);
     setProfile(next);
     setRecheckProfile(next);
     setActive("report");
