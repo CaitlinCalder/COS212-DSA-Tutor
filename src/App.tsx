@@ -1,8 +1,4 @@
-import Quests from "./part4/Quests";
+import AppShell from "./part5/AppShell";
 
-/**
- * Temporary preview entry point until Part 5 integrates quests into the app shell.
- */
-export function App() {
-  return <Quests />;
-}
+/** Part 5 application shell integrates the existing learning components. */
+export function App() { return <AppShell />; }
