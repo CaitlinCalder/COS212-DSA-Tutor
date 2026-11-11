@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
-import type { ChangeEvent } from "react";
+import graphOverviewVideo from "./graph_overview.mp4";
 import GraphSandbox from "../part3/GraphSandbox";
 import Quests from "../part4/Quests";
-import { diagnosticItems, recheckItems } from "../part1/content";
+import { diagnosticItems } from "../part1/content";
 import {
   completeQuest,
   getQuestPlan,
@@ -174,27 +174,18 @@ export default function AppShell() {
   const [active, setActive] = useState<ViewId>("video");
   const [profile, setProfile] = useState<SkillProfile>(() => startJourney());
   const [initialProfile, setInitialProfile] = useState<SkillProfile | null>(null);
+  const [diagnosticResponses, setDiagnosticResponses] = useState<QuizResponse[]>([]);
   const [recheckProfile, setRecheckProfile] = useState<SkillProfile | null>(null);
-  const [videoUrl, setVideoUrl] = useState("");
-  const [videoName, setVideoName] = useState("");
   const [slideFiles, setSlideFiles] = useState<File[]>([]);
   const [draggingSlides, setDraggingSlides] = useState(false);
   const [generationStage, setGenerationStage] = useState<"idle" | "analysing" | "creating" | "ready">("idle");
   const [generationMessage, setGenerationMessage] = useState("");
   const questPlan = useMemo(() => getQuestPlan(profile), [profile]);
   const recheckIds = useMemo(() => new Set(recheckItemIds(profile)), [profile]);
-  const recheckQuizItems = useMemo(() => recheckItems.filter((item) => recheckIds.has(item.id)), [recheckIds]);
+  const recheckItems = useMemo(() => diagnosticItems.filter((item) => recheckIds.has(item.id)), [recheckIds]);
 
   const currentIndex = STEPS.findIndex((step) => step.id === active);
   const progress = active === "lecturer" ? 100 : Math.max(0, ((currentIndex + 1) / STEPS.length) * 100);
-
-  function handleVideo(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    if (videoUrl) URL.revokeObjectURL(videoUrl);
-    setVideoUrl(URL.createObjectURL(file));
-    setVideoName(file.name);
-  }
 
   function addSlideFiles(files: FileList | File[]) {
     const accepted = Array.from(files).filter((file) => /\.(pdf|ppt|pptx)$/i.test(file.name));
@@ -207,7 +198,6 @@ export default function AppShell() {
 
   function generateDemoVideo() {
     if (!slideFiles.length) { setGenerationMessage("Add your lecture slides first."); return; }
-    if (!videoUrl) { setGenerationMessage("First add the pre-generated NotebookLM MP4 using the video upload button. It will be used as the generated output."); return; }
     setGenerationStage("analysing");
     setGenerationMessage("Reading your slide deck and identifying the key learning points…");
     window.setTimeout(() => {
@@ -222,6 +212,7 @@ export default function AppShell() {
 
   function submitDiagnostic(responses: QuizResponse[]) {
     const next = runDiagnostic(responses);
+    setDiagnosticResponses(responses);
     setProfile(next);
     setInitialProfile(next);
     setRecheckProfile(null);
@@ -234,7 +225,7 @@ export default function AppShell() {
 
   function submitRecheck(responses: QuizResponse[]) {
     if (!initialProfile) return;
-    const next = runRecheck(profile, responses);
+    const next = runRecheck(profile, diagnosticResponses, responses);
     setProfile(next);
     setRecheckProfile(next);
     setActive("report");
@@ -256,7 +247,7 @@ export default function AppShell() {
       <main className="main-area">
         <header className="topbar"><div><span className="topbar-kicker">DATA STRUCTURES & ALGORITHMS</span><strong>{active === "lecturer" ? "Lecturer dashboard" : activeStep?.title}</strong></div><div className="topbar-right"><span className="progress-label">{active === "lecturer" ? "DEMO CLASS" : `STEP ${currentIndex + 1} OF 7`}</span><div className="progress-track"><span style={{ width: `${progress}%` }}/></div></div></header>
         <div className="content-area">
-          {active === "video" && <section className="embedded-section video-workflow"><div className="page-intro"><p className="eyebrow">STEP 01 · PREPARE</p><h1>Turn your lecture slides into a video</h1><p>Upload the slides you want to study. The prototype simulates the generation steps and shows the prepared NotebookLM video as the output.</p></div><div className="video-workflow-grid"><section className={`panel slide-dropzone${draggingSlides ? " is-dragging" : ""}`} onDragOver={(event) => { event.preventDefault(); setDraggingSlides(true); }} onDragLeave={() => setDraggingSlides(false)} onDrop={(event) => { event.preventDefault(); setDraggingSlides(false); addSlideFiles(event.dataTransfer.files); }}><div className="drop-icon">⇧</div><h2>Upload your lecture slides</h2><p>Drag PDF or PowerPoint files here, or browse your computer.</p><label className="primary-button slide-browse">Choose slides<input type="file" accept=".pdf,.ppt,.pptx" multiple onChange={(event) => { if (event.target.files) addSlideFiles(event.target.files); event.target.value = ""; }}/></label>{slideFiles.length > 0 && <div className="slide-file-list"><strong>{slideFiles.length} slide file{slideFiles.length === 1 ? "" : "s"} added</strong>{slideFiles.map((file, index) => <div className="slide-file" key={`${file.name}-${index}`}><span>▤ {file.name}</span><button type="button" onClick={() => setSlideFiles((current) => current.filter((_, fileIndex) => fileIndex !== index))}>Remove</button></div>)}</div>}</section><section className="panel generation-panel"><p className="eyebrow">VIDEO OUTPUT</p><h2>Generate your learning video</h2><p>For the demo, upload the pre-generated NotebookLM MP4 once. It will appear here after the simulated generation process.</p><label className="upload-button">{videoName ? "Replace NotebookLM video" : "Add NotebookLM MP4"}<input type="file" accept="video/mp4,video/*" onChange={handleVideo}/></label>{videoName && <p className="video-note">Output video: {videoName}</p>}<button className="primary-button generate-button" onClick={generateDemoVideo} disabled={generationStage === "analysing" || generationStage === "creating"}>{generationStage === "analysing" || generationStage === "creating" ? "Generating video…" : generationStage === "ready" ? "Generate again" : "Generate video →"}</button>{generationStage !== "idle" && <div className="generation-status" aria-live="polite"><div className="generation-track"><span className={generationStage === "ready" ? "complete" : "working"}/></div><strong>{generationStage === "analysing" ? "1. Analysing slides" : generationStage === "creating" ? "2. Preparing video" : "3. Video ready"}</strong><p>{generationMessage}</p></div>}{generationMessage && generationStage === "idle" && <p className="generation-hint">{generationMessage}</p>}</section></div>{generationStage === "ready" && videoUrl && <section className="panel generated-output"><p className="eyebrow">GENERATED VIDEO · DEMO OUTPUT</p><h2>Your lesson is ready</h2><p>This is the pre-generated NotebookLM output. Slide analysis and generation are simulated in this prototype.</p><video controls src={videoUrl}/></section>}<div className="video-workflow-footer"><button className="secondary-button" onClick={() => setActive("sandbox")}>Skip to sandbox →</button><span>Prototype workflow · no live NotebookLM API connection</span></div></section>}
+          {active === "video" && <section className="embedded-section video-workflow"><div className="page-intro"><p className="eyebrow">STEP 01 · PREPARE</p><h1>Turn your lecture slides into a video</h1><p>Upload the slides you want to study. The prototype simulates the generation steps and shows the prepared overview video as the output.</p></div><div className="video-workflow-grid"><section className={`panel slide-dropzone${draggingSlides ? " is-dragging" : ""}`} onDragOver={(event) => { event.preventDefault(); setDraggingSlides(true); }} onDragLeave={() => setDraggingSlides(false)} onDrop={(event) => { event.preventDefault(); setDraggingSlides(false); addSlideFiles(event.dataTransfer.files); }}><div className="drop-icon">⇧</div><h2>Upload your lecture slides</h2><p>Drag PDF or PowerPoint files here, or browse your computer.</p><label className="primary-button slide-browse">Choose slides<input type="file" accept=".pdf,.ppt,.pptx" multiple onChange={(event) => { if (event.target.files) addSlideFiles(event.target.files); event.target.value = ""; }}/></label>{slideFiles.length > 0 && <div className="slide-file-list"><strong>{slideFiles.length} slide file{slideFiles.length === 1 ? "" : "s"} added</strong>{slideFiles.map((file, index) => <div className="slide-file" key={`${file.name}-${index}`}><span>▤ {file.name}</span><button type="button" onClick={() => setSlideFiles((current) => current.filter((_, fileIndex) => fileIndex !== index))}>Remove</button></div>)}</div>}</section><section className="panel generation-panel"><p className="eyebrow">VIDEO OUTPUT</p><h2>Generate your learning video</h2><p>Upload your slides, then click Generate. The prototype simulates the generation process and outputs the prepared graph overview video.</p><button className="primary-button generate-button" onClick={generateDemoVideo} disabled={generationStage === "analysing" || generationStage === "creating"}>{generationStage === "analysing" || generationStage === "creating" ? "Generating video…" : generationStage === "ready" ? "Generate again" : "Generate video →"}</button>{generationStage !== "idle" && <div className="generation-status" aria-live="polite"><div className="generation-track"><span className={generationStage === "ready" ? "complete" : "working"}/></div><strong>{generationStage === "analysing" ? "1. Analysing slides" : generationStage === "creating" ? "2. Preparing video" : "3. Video ready"}</strong><p>{generationMessage}</p></div>}{generationMessage && generationStage === "idle" && <p className="generation-hint">{generationMessage}</p>}</section></div>{generationStage === "ready" && <section className="panel generated-output"><p className="eyebrow">GENERATED VIDEO · DEMO OUTPUT</p><h2>Your lesson is ready</h2><p>Slide analysis and generation are simulated in this prototype. The output is the prepared graph overview video.</p><video controls src={graphOverviewVideo}/></section>}<div className="video-workflow-footer"><button className="secondary-button" onClick={() => setActive("sandbox")}>Skip to sandbox →</button><span>Prototype workflow · no live NotebookLM API connection</span></div></section>}
 
           {active === "sandbox" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 02 · EXPLORE</p><h1>Play with a graph</h1><p>Add vertices and edges, then step through BFS and watch the queue change.</p></div><GraphSandbox/></section>}
 
@@ -266,7 +257,7 @@ export default function AppShell() {
 
           {active === "quests" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 05 · PRACTISE</p><h1>Restore the town network</h1><p>Choose a district and practise a skill that needs attention. Your progress stays tentative until the re-check.</p></div><Quests questPlan={questPlan} onQuestComplete={handleQuestComplete}/><div className="below-action"><button className="primary-button" onClick={() => setActive("recheck")}>Continue to re-check →</button></div></section>}
 
-          {active === "recheck" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 06 · RE-MEASURE</p><h1>Check what has grown</h1><p>Revisit the skills you were still developing and see whether your understanding has changed.</p></div><QuizPanel title="Re-check quiz" description={`${recheckQuizItems.length} questions covering your outstanding skills.`} items={recheckQuizItems} submitLabel="Submit re-check" onSubmit={submitRecheck}/>{recheckQuizItems.length === 0 && <button className="primary-button" onClick={() => setActive("report")}>View report →</button>}</section>}
+          {active === "recheck" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 06 · RE-MEASURE</p><h1>Check what has grown</h1><p>Revisit the skills you were still developing and see whether your understanding has changed.</p></div><div className="notice-banner"><strong>Prototype assessment note:</strong> Part 1 currently exports the diagnostic question bank only. Until a separate re-check bank is supplied, this prototype reuses the relevant diagnostic items. The question bank is not represented as a different assessment.</div><QuizPanel title="Re-check quiz" description={`${recheckItems.length} questions covering your outstanding skills.`} items={recheckItems} submitLabel="Submit re-check" onSubmit={submitRecheck}/>{recheckItems.length === 0 && <button className="primary-button" onClick={() => setActive("report")}>View report →</button>}</section>}
 
           {active === "report" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 07 · CARRY FORWARD</p><h1>Your lecture-ready report</h1><p>A one-page summary of your current strengths and areas to revisit.</p></div><StudentReport profile={profile} before={initialProfile} after={recheckProfile}/></section>}
 
