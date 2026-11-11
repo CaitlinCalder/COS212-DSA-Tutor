@@ -18,6 +18,57 @@ export function adjacencyListText(graph: GraphModel): string {
     .join("\n");
   }
 
+//vertices sit evenly on an ellipse, ordered to minimise crossing edges
+function countCrossings(order: string[], graph: GraphModel): number {
+  const pos = new Map(order.map((v, i) => [v, i]));
+  const chords = graph.edges
+    .filter((e) => e.from !== e.to)
+    .map((e) => {
+      const a = pos.get(e.from)!;
+      const b = pos.get(e.to)!;
+      return a < b ? [a, b] : [b, a];
+    });
+  let crossings = 0;
+  for (let i = 0; i < chords.length; i++) {
+    for (let j = i + 1; j < chords.length; j++) {
+      const [a, b] = chords[i];
+      const [c, d] = chords[j];
+      if ((a < c && c < b && b < d) || (c < a && a < d && d < b)) crossings++;
+    }
+  }
+  return crossings;
+}
+
+function permutations<T>(items: T[]): T[][] {
+  if (items.length <= 1) return [items];
+  return items.flatMap((item, i) =>
+    permutations([...items.slice(0, i), ...items.slice(i + 1)]).map((rest) => [item, ...rest]),
+  );
+}
+
+export function quizGraphLayout(graph: GraphModel): Record<string, { x: number; y: number }> {
+  if (graph.vertices.length === 0) return {};
+  const [first, ...rest] = graph.vertices;
+  // Brute force is fine: quiz graphs have at most five or six vertices. Fix the first vertex to skip rotations.
+  const candidates = rest.length <= 6 ? permutations(rest).map((p) => [first, ...p]) : [graph.vertices];
+  let best = candidates[0] ?? [];
+  let bestCrossings = Infinity;
+  for (const order of candidates) {
+    const crossings = countCrossings(order, graph);
+    if (crossings < bestCrossings) {
+      best = order;
+      bestCrossings = crossings;
+    }
+  }
+
+  const layout: Record<string, { x: number; y: number }> = {};
+  best.forEach((vertex, i) => {
+    const angle = -Math.PI / 2 + (2 * Math.PI * i) / best.length;
+    layout[vertex] = { x: 400 + 190 * Math.cos(angle), y: 210 + 115 * Math.sin(angle) };
+  });
+  return layout;
+}
+
 //graph definitions
 export const graphA2Diag: GraphModel = {
   vertices: ["A", "B", "C", "D"],

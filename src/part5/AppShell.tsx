@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import graphOverviewVideo from "./graph_overview.mp4";
 import GraphSandbox from "../part3/GraphSandbox";
+import GraphQueueView from "../part3/GraphQueueView";
+import { quizGraphLayout } from "../part1/graphs";
 import Quests from "../part4/Quests";
 import { diagnosticItems } from "../part1/content";
 import {
@@ -110,8 +112,24 @@ function QuizPanel({
             <article className="question-card" key={item.id}>
               <div className="question-meta"><span>QUESTION {index + 1} OF {items.length}</span><span>{item.requires.join(" · ")}</span></div>
               <h3>{item.prompt}</h3>
-              {item.adjacencyText && <pre className="adjacency">{item.adjacencyText}</pre>}
-              {item.graph && <p className="muted small">A graph is supplied with this question in the original assessment content.</p>}
+              {item.graph && (
+                <div className="question-graph">
+                  <GraphQueueView
+                    graph={item.graph}
+                    title={item.graph.directed ? "Directed graph for this question" : "Graph for this question"}
+                    initialPositions={quizGraphLayout(item.graph)}
+                    showQueue={false}
+                    showLegend={false}
+                    readOnly
+                  />
+                </div>
+              )}
+              {item.adjacencyText && (
+                <details className="adjacency-details" open>
+                  <summary>Adjacency list (the same graph as text)</summary>
+                  <pre className="adjacency">{item.adjacencyText}</pre>
+                </details>
+              )}
               <div className="answer-options">
                 {item.options.map((option) => (
                   <label className={`answer-option${answers[item.id] === option.id ? " selected" : ""}`} key={option.id}>

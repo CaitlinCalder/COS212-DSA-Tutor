@@ -78,6 +78,9 @@
 .answer-option.selected { border-color:#4d88aa; background:#eef6fb; }
 .answer-option input { accent-color:#1c628d; margin-top:2px; }
 .adjacency { background:#f2f6f9; border-radius:7px; padding:12px; color:#34546d; white-space:pre-wrap; font-size:12px; }
+.question-graph { margin:0 0 12px; }
+.adjacency-details { margin:0 0 12px; }
+.adjacency-details summary { color:#315f7d; cursor:pointer; font-size:11px; font-weight:700; margin-bottom:6px; }
 .small { font-size:11px!important; }
 .muted { color:#8495a4!important; }
 .action-row { display:flex; align-items:center; gap:15px; flex-wrap:wrap; margin-top:20px; }
