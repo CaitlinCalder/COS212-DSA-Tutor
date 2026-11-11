@@ -16,6 +16,7 @@ import {
 import type { QuizResponse, SkillId, SkillProfile, SkillState } from "../shared/types";
 import { SKILL_ORDER } from "../shared/types";
 import type { QuestCompletion } from "../part4/questTypes";
+import SkillTown from "./SkillTown";
 import "./AppShell.css";
 
 type StepId = "video" | "sandbox" | "diagnostic" | "profile" | "quests" | "recheck" | "report";
@@ -25,7 +26,7 @@ const STEPS: { id: StepId; number: string; title: string; subtitle: string }[] =
   { id: "video", number: "01", title: "Overview video", subtitle: "Meet graphs and BFS" },
   { id: "sandbox", number: "02", title: "Sandbox", subtitle: "Explore a network" },
   { id: "diagnostic", number: "03", title: "Diagnostic", subtitle: "Find your starting point" },
-  { id: "profile", number: "04", title: "Your profile", subtitle: "See your skill tree" },
+  { id: "profile", number: "04", title: "Your profile", subtitle: "See your skill town" },
   { id: "quests", number: "05", title: "Quests", subtitle: "Practise your skill gaps" },
   { id: "recheck", number: "06", title: "Re-check", subtitle: "Measure your growth" },
   { id: "report", number: "07", title: "Your report", subtitle: "Prepare for the lecture" },
@@ -68,23 +69,6 @@ function heatColor(value: number) {
   return "#f2b9b2";
 }
 
-function SkillTree({ profile }: { profile: SkillProfile }) {
-  return (
-    <div className="skill-tree" aria-label="Six-skill learning tree">
-      {SKILL_ORDER.map((skill, index) => {
-        const state = profile.states[skill];
-        return (
-          <div className={`tree-node tree-node--${state}`} key={skill}>
-            <div className="tree-node__stem">{index === 0 ? "ROOT" : `LEVEL ${index + 1}`}</div>
-            <div className="tree-node__circle">{state === "confirmed" ? "✓" : skill}</div>
-            <strong>{SKILL_INFO[skill].name}</strong>
-            <span>{STATE_LABEL[state]}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 function QuizPanel({
   title, description, items, onSubmit, submitLabel,
@@ -270,7 +254,7 @@ export default function AppShell() {
 
           {active === "diagnostic" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 03 · MEASURE</p><h1>Find your starting point</h1><p>Answer the questions to identify which of the six skills you already understand and which need practice.</p></div><QuizPanel title="Diagnostic quiz" description="13 questions · six skills · no penalty for getting something wrong." items={diagnosticItems} submitLabel="Submit diagnostic" onSubmit={submitDiagnostic}/></section>}
 
-          {active === "profile" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 04 · REFLECT</p><h1>Your skill tree</h1><p>Your branches show what you know, what needs practice, and what is waiting for confirmation.</p></div><div className="panel"><div className="section-heading"><div><h2>Six skills, one growing tree</h2><p>Quest completion makes a branch tentative. Only the re-check can confirm it.</p></div></div><SkillTree profile={profile}/><div className="tree-legend"><span>○ Not assessed</span><span>● Needs practice</span><span>◐ Tentative</span><span>✓ Confirmed</span></div><div className="action-row"><button className="primary-button" onClick={() => setActive("quests")}>Go to your quests →</button><button className="secondary-button" onClick={() => setActive("diagnostic")}>Retake diagnostic</button></div></div></section>}
+          {active === "profile" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 04 · REFLECT</p><h1>Your skill town</h1><p>Each building is one of the six skills. Watch it go from blueprint to open for business as you learn.</p></div><div className="panel"><div className="section-heading"><div><h2>Six skills, one growing town</h2><p>Finishing a quest builds the building, but the lights only come on once the re-check confirms it.</p></div></div><SkillTown profile={profile} info={SKILL_INFO}/><div className="action-row"><button className="primary-button" onClick={() => setActive("quests")}>Go to your quests →</button><button className="secondary-button" onClick={() => setActive("diagnostic")}>Retake diagnostic</button></div></div></section>}
 
           {active === "quests" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 05 · PRACTISE</p><h1>Restore the town network</h1><p>Choose a district and practise a skill that needs attention. Your progress stays tentative until the re-check.</p></div><Quests questPlan={questPlan} onQuestComplete={handleQuestComplete}/><div className="below-action"><button className="primary-button" onClick={() => setActive("recheck")}>Continue to re-check →</button></div></section>}
 
