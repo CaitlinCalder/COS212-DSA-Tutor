@@ -4,7 +4,7 @@ import GraphSandbox from "../part3/GraphSandbox";
 import GraphQueueView from "../part3/GraphQueueView";
 import { quizGraphLayout } from "../part1/graphs";
 import Quests from "../part4/Quests";
-import { diagnosticItems } from "../part1/content";
+import { diagnosticItems, recheckItems } from "../part1/content";
 import {
   completeQuest,
   getQuestPlan,
@@ -199,7 +199,8 @@ export default function AppShell() {
   const [generationMessage, setGenerationMessage] = useState("");
   const questPlan = useMemo(() => getQuestPlan(profile), [profile]);
   const recheckIds = useMemo(() => new Set(recheckItemIds(profile)), [profile]);
-  const recheckItems = useMemo(() => diagnosticItems.filter((item) => recheckIds.has(item.id)), [recheckIds]);
+  //re-check ids come from the re-check bank, so filter that bank 
+  const recheckQuizItems = useMemo(() => recheckItems.filter((item) => recheckIds.has(item.id)), [recheckIds]);
 
   const currentIndex = STEPS.findIndex((step) => step.id === active);
   const progress = active === "lecturer" ? 100 : Math.max(0, ((currentIndex + 1) / STEPS.length) * 100);
@@ -273,7 +274,7 @@ export default function AppShell() {
 
           {active === "quests" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 05 · PRACTISE</p><h1>Restore the town network</h1><p>Choose a district and practise a skill that needs attention. Your progress stays tentative until the re-check.</p></div><Quests questPlan={questPlan} onQuestComplete={handleQuestComplete}/><div className="below-action"><button className="primary-button" onClick={() => setActive("recheck")}>Continue to re-check →</button></div></section>}
 
-          {active === "recheck" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 06 · RE-MEASURE</p><h1>Check what has grown</h1><p>Revisit the skills you were still developing and see whether your understanding has changed.</p></div><div className="notice-banner"><strong>Prototype assessment note:</strong> Part 1 currently exports the diagnostic question bank only. Until a separate re-check bank is supplied, this prototype reuses the relevant diagnostic items. The question bank is not represented as a different assessment.</div><QuizPanel title="Re-check quiz" description={`${recheckItems.length} questions covering your outstanding skills.`} items={recheckItems} submitLabel="Submit re-check" onSubmit={submitRecheck}/>{recheckItems.length === 0 && <button className="primary-button" onClick={() => setActive("report")}>View report →</button>}</section>}
+          {active === "recheck" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 06 · RE-MEASURE</p><h1>Check what has grown</h1><p>Revisit the skills you were still developing and see whether your understanding has changed.</p></div>{recheckQuizItems.length === 0 ? <section className="panel"><div className="empty-state"><h3>{initialProfile ? "Nothing left to re-check" : "Take the diagnostic first"}</h3><p>{initialProfile ? "None of your skills are waiting for a re-check, so there is nothing more to measure." : "The re-check only covers skills the diagnostic found you still need to practise, so it cannot start until you have taken the diagnostic."}</p><div className="action-row">{initialProfile ? <button className="primary-button" onClick={() => setActive("report")}>View report →</button> : <button className="primary-button" onClick={() => setActive("diagnostic")}>Go to the diagnostic →</button>}</div></div></section> : <><div className="notice-banner"><strong>New questions, fewer of them.</strong> These are different questions from the diagnostic, and they only cover the skills you are still developing. Skills you already showed you understand are not asked again.</div><QuizPanel title="Re-check quiz" description={`${recheckQuizItems.length} questions covering the skills you are still developing.`} items={recheckQuizItems} submitLabel="Submit re-check" onSubmit={submitRecheck}/></>}</section>}
 
           {active === "report" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 07 · CARRY FORWARD</p><h1>Your lecture-ready report</h1><p>A one-page summary of your current strengths and areas to revisit.</p></div><StudentReport profile={profile} before={initialProfile} after={recheckProfile}/></section>}
 
