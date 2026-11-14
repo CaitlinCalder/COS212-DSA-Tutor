@@ -57,6 +57,7 @@ src/
 │   ├── GraphQueueView.integration.test.tsx
 │   ├── GraphQueueView.tsx
 │   ├── GraphSandbox.css
+│   ├── GraphSandbox.integration.test.tsx
 │   ├── GraphSandbox.tsx
 │   ├── graphUtils.test.ts
 │   ├── graphUtils.ts
@@ -71,7 +72,7 @@ src/
 | `GraphQueueView.tsx` | Reusable graph and queue visualisation component. |
 | `graphUtils.ts` | Graph operations, adjacency lists, BFS, and shortest-route algorithms. |
 | `*.css` | Styling for the Sandbox and visualisation component. |
-| `*.test.ts(x)` | Unit and integration tests. |
+| `*.test.ts(x)` | Unit and integration tests, including sandbox BFS, route, and graph-editing interactions. |
 | `screenshots/` | Screenshots of the Sandbox's two modes. |
 | `shared/types.ts` | Shared graph types used across the application. |
 
