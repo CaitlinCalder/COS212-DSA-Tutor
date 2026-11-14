@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import graphOverviewVideo from "./graph_overview.mp4";
+import graphOverviewCaptions from "./graph_overview.vtt";
 import GraphSandbox from "../part3/GraphSandbox";
 import GraphQueueView from "../part3/GraphQueueView";
 import { quizGraphLayout } from "../part1/graphs";
@@ -55,6 +56,74 @@ const SIMULATED_CLASS = [
   [62, 56, 65, 47, 39, 34], [79, 74, 70, 60, 53, 45], [90, 86, 81, 74, 69, 63],
   [68, 65, 58, 51, 43, 37], [86, 82, 77, 68, 60, 54], [73, 70, 64, 56, 48, 42],
   [95, 91, 88, 81, 76, 71], [59, 61, 57, 45, 38, 32], [81, 77, 73, 63, 55, 49],
+];
+
+const GRAPH_VIDEO_TRANSCRIPT = [
+  {
+    title: "Introduction",
+    time: "00:00–00:40",
+    paragraphs: [
+      "This video introduces graph data structures and Breadth-First Search, commonly known as BFS.",
+      "The topics covered include what a graph is, adjacency lists, queues, how BFS works, tracing BFS, and applications of BFS.",
+    ],
+  },
+  {
+    title: "1. What is a graph?",
+    time: "00:40–01:35",
+    paragraphs: [
+      "A graph is a non-linear data structure made up of vertices connected by edges.",
+      "A vertex represents an individual item or location, while an edge represents a connection between two vertices.",
+      "Graphs can contain directed or undirected edges. Undirected edges work in both directions, while directed edges have a specific direction and do not automatically allow travel back the other way.",
+    ],
+  },
+  {
+    title: "2. Adjacency lists",
+    time: "01:35–02:15",
+    paragraphs: [
+      "An adjacency list records the neighbours of each vertex so that a graph can be represented in a structured way.",
+      "For example, if vertex 0 is connected to vertices 1 and 2, its adjacency list contains 1 and 2.",
+      "Adjacency lists are commonly used in graph algorithms such as BFS because they make it easy to find a vertex's immediate neighbours.",
+    ],
+  },
+  {
+    title: "3. Queues",
+    time: "02:15–03:00",
+    paragraphs: [
+      "A queue is a First-In, First-Out data structure. The first item added is the first item removed.",
+      "A queue behaves like a line of people waiting for service. The person who joins the line first is served first.",
+      "BFS uses a queue to keep track of which vertices must be explored next.",
+    ],
+  },
+  {
+    title: "4. BFS explained",
+    time: "03:00–03:45",
+    paragraphs: [
+      "Breadth-First Search is a graph traversal algorithm that explores vertices level by level.",
+      "It begins at a chosen starting vertex, explores its immediate neighbours first, and then moves on to vertices that are further away.",
+      "The general process is to initialise the start, remove the next vertex from the front of the queue, enqueue its unvisited neighbours, and repeat until the queue is empty.",
+      "The visited set prevents the algorithm from processing the same vertex repeatedly, which is especially important when the graph contains cycles.",
+    ],
+  },
+  {
+    title: "5. Tracing BFS",
+    time: "03:45–05:00",
+    paragraphs: [
+      "Tracing BFS means following the algorithm step by step and recording the queue, visited set, and current vertex being explored.",
+      "The process begins by placing the starting vertex in the queue and marking it as visited.",
+      "Then the algorithm removes the front vertex, examines its neighbours, and adds any unvisited neighbours to the back of the queue.",
+      "Because the queue follows First-In, First-Out logic, vertices are explored in the order they were discovered, which is why BFS expands outward level by level.",
+      "BFS can also be used to find the shortest path between vertices in an unweighted graph, where each edge is treated as the same cost.",
+    ],
+  },
+  {
+    title: "6. Applications of BFS",
+    time: "05:00–06:13",
+    paragraphs: [
+      "BFS has several practical applications, including exploring graphs level by level, finding shortest paths in unweighted graphs, and detecting cycles in some graph structures.",
+      "It is also used in social networks to explore relationships and identify connections at different distances from a starting point.",
+      "The video concludes by asking what happens when graph edges have different weights. BFS treats every edge equally, so other algorithms such as Dijkstra's algorithm are needed for weighted graphs.",
+    ],
+  },
 ];
 
 function scoreLabel(value: number) {
@@ -248,9 +317,7 @@ export default function AppShell() {
       <main className="main-area">
         <header className="topbar"><div><span className="topbar-kicker">DATA STRUCTURES & ALGORITHMS</span><strong>{active === "lecturer" ? "Lecturer dashboard" : activeStep?.title}</strong></div><div className="topbar-right"><span className="progress-label">{active === "lecturer" ? "DEMO CLASS" : `STEP ${currentIndex + 1} OF 7`}</span><div className="progress-track"><span style={{ width: `${progress}%` }}/></div></div></header>
         <div className="content-area">
-          {active === "video" && <section className="embedded-section video-workflow"><div className="page-intro"><p className="eyebrow">STEP 01 · PREPARE</p><h1>Turn your lecture slides into a video</h1><p>Upload the slides you want to study. The prototype simulates the generation steps and shows the prepared overview video as the output.</p></div><div className="video-workflow-grid"><section className={`panel slide-dropzone${draggingSlides ? " is-dragging" : ""}`} onDragOver={(event) => { event.preventDefault(); setDraggingSlides(true); }} onDragLeave={() => setDraggingSlides(false)} onDrop={(event) => { event.preventDefault(); setDraggingSlides(false); addSlideFiles(event.dataTransfer.files); }}><div className="drop-icon">⇧</div><h2>Upload your lecture slides</h2><p>Drag PDF or PowerPoint files here, or browse your computer.</p><label className="primary-button slide-browse">Choose slides<input type="file" accept=".pdf,.ppt,.pptx" multiple onChange={(event) => { if (event.target.files) addSlideFiles(event.target.files); event.target.value = ""; }}/></label>{slideFiles.length > 0 && <div className="slide-file-list"><strong>{slideFiles.length} slide file{slideFiles.length === 1 ? "" : "s"} added</strong>{slideFiles.map((file, index) => <div className="slide-file" key={`${file.name}-${index}`}><span>▤ {file.name}</span><button type="button" onClick={() => setSlideFiles((current) => current.filter((_, fileIndex) => fileIndex !== index))}>Remove</button></div>)}</div>}</section><section className="panel generation-panel"><p className="eyebrow">VIDEO OUTPUT</p><h2>Generate your learning video</h2><p>Upload your slides, then click Generate. The prototype simulates the generation process and outputs the prepared graph overview video.</p><button className="primary-button generate-button" onClick={generateDemoVideo} disabled={generationStage === "analysing" || generationStage === "creating"}>{generationStage === "analysing" || generationStage === "creating" ? "Generating video…" : generationStage === "ready" ? "Generate again" : "Generate video →"}</button>{generationStage !== "idle" && <div className="generation-status" aria-live="polite"><div className="generation-track"><span className={generationStage === "ready" ? "complete" : "working"}/></div><strong>{generationStage === "analysing" ? "1. Analysing slides" : generationStage === "creating" ? "2. Preparing video" : "3. Video ready"}</strong><p>{generationMessage}</p></div>}{generationMessage && generationStage === "idle" && <p className="generation-hint">{generationMessage}</p>}</section></div>{generationStage === "ready" && <section className="panel generated-output"><p className="eyebrow">GENERATED VIDEO · DEMO OUTPUT</p><h2>Your lesson is ready</h2><p>Slide analysis and generation are simulated in this prototype. The output is the prepared graph overview video.</p><video controls src={graphOverviewVideo}/></section>}<div className="video-workflow-footer"><button className="secondary-button" onClick={() => setActive("sandbox")}>Skip to sandbox →</button><span>Prototype workflow · no live NotebookLM API connection</span></div></section>}
-
-          {active === "sandbox" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 02 · EXPLORE</p><h1>Play with a graph</h1><p>Add vertices and edges, then step through BFS and watch the queue change.</p></div><GraphSandbox/></section>}
+          {active === "video" && <section className="embedded-section video-workflow"><div className="page-intro"><p className="eyebrow">STEP 01 · PREPARE</p><h1>Turn your lecture slides into a video</h1><p>Upload the slides you want to study. The prototype simulates the generation steps and shows the prepared overview video as the output.</p></div><div className="video-workflow-grid"><section className={`panel slide-dropzone${draggingSlides ? " is-dragging" : ""}`} onDragOver={(event) => { event.preventDefault(); setDraggingSlides(true); }} onDragLeave={() => setDraggingSlides(false)} onDrop={(event) => { event.preventDefault(); setDraggingSlides(false); addSlideFiles(event.dataTransfer.files); }}><div className="drop-icon">⇧</div><h2>Upload your lecture slides</h2><p>Drag PDF or PowerPoint files here, or browse your computer.</p><label className="primary-button slide-browse">Choose slides<input type="file" accept=".pdf,.ppt,.pptx" multiple onChange={(event) => { if (event.target.files) addSlideFiles(event.target.files); event.target.value = ""; }}/></label>{slideFiles.length > 0 && <div className="slide-file-list"><strong>{slideFiles.length} slide file{slideFiles.length === 1 ? "" : "s"} added</strong>{slideFiles.map((file, index) => <div className="slide-file" key={`${file.name}-${index}`}><span>▤ {file.name}</span><button type="button" onClick={() => setSlideFiles((current) => current.filter((_, fileIndex) => fileIndex !== index))}>Remove</button></div>)}</div>}</section><section className="panel generation-panel"><p className="eyebrow">VIDEO OUTPUT</p><h2>Generate your learning video</h2><p>Upload your slides, then click Generate. The prototype simulates the generation process and outputs the prepared graph overview video.</p><button className="primary-button generate-button" onClick={generateDemoVideo} disabled={generationStage === "analysing" || generationStage === "creating"}>{generationStage === "analysing" || generationStage === "creating" ? "Generating video…" : generationStage === "ready" ? "Generate again" : "Generate video →"}</button>{generationStage !== "idle" && <div className="generation-status" aria-live="polite"><div className="generation-track"><span className={generationStage === "ready" ? "complete" : "working"}/></div><strong>{generationStage === "analysing" ? "1. Analysing slides" : generationStage === "creating" ? "2. Preparing video" : "3. Video ready"}</strong><p>{generationMessage}</p></div>}{generationMessage && generationStage === "idle" && <p className="generation-hint">{generationMessage}</p>}</section></div>                    {generationStage === "ready" && <section className="panel generated-output"><p className="eyebrow">GENERATED VIDEO · DEMO OUTPUT</p><h2>Your lesson is ready</h2><p>Slide analysis and generation are simulated in this prototype. The output is the prepared graph overview video.</p><video controls src={graphOverviewVideo}><track kind="captions" src={graphOverviewCaptions} srcLang="en" label="English" default /></video><div className="transcript-follow-along"><div className="transcript-heading"><p className="eyebrow">FOLLOW-ALONG TRANSCRIPT</p><h3>Low-bandwidth reading guide</h3></div>{GRAPH_VIDEO_TRANSCRIPT.map((section) => <section className="transcript-section" key={section.title}><div className="transcript-meta"><strong>{section.title}</strong><span>{section.time}</span></div>{section.paragraphs.map((paragraph) => <p key={`${section.title}-${paragraph}`}>{paragraph}</p>)}</section>)}</div></section>}<div className="video-workflow-footer"><button className="secondary-button" onClick={() => setActive("sandbox")}>Skip to sandbox →</button><span>Prototype workflow · no live NotebookLM API connection</span></div></section>}          {active === "sandbox" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 02 · EXPLORE</p><h1>Play with a graph</h1><p>Add vertices and edges, then step through BFS and watch the queue change.</p></div><GraphSandbox/></section>}
 
           {active === "diagnostic" && <section className="embedded-section"><div className="page-intro"><p className="eyebrow">STEP 03 · MEASURE</p><h1>Find your starting point</h1><p>Answer the questions to identify which of the six skills you already understand and which need practice.</p></div><QuizPanel title="Diagnostic quiz" description="13 questions · six skills · no penalty for getting something wrong." items={diagnosticItems} submitLabel="Submit diagnostic" onSubmit={submitDiagnostic}/></section>}
 

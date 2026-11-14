@@ -29,13 +29,14 @@ Part 5 is the top-level integration layer of the COS212 BFS Tutor. It assembles 
 
 ### How the video is supplied
 
-The overview video (`graph_overview.mp4`) is bundled directly into the application as a static asset. It is imported at the top of `AppShell.tsx` using Vite's asset import mechanism:
+The overview video (`graph_overview.mp4`) and its English caption track (`graph_overview.vtt`) are bundled directly into the application as static assets. They are imported at the top of `AppShell.tsx` using Vite's asset import mechanism:
 
 ```ts
 import graphOverviewVideo from "./graph_overview.mp4";
+import graphOverviewCaptions from "./graph_overview.vtt";
 ```
 
-Vite resolves this to a hashed asset URL at build time. No manual video upload is needed during the demo — clicking **Generate video →** is all that is required after slides have been added.
+The video element includes a `<track kind="captions">` entry so the transcript is available as default closed captions in supported browsers. Vite resolves these to hashed asset URLs at build time. No manual video upload is needed during the demo — clicking **Generate video →** is all that is required after slides have been added.
 
 ### What the prototype does not do
 
