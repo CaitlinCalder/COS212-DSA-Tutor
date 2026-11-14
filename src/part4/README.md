@@ -73,6 +73,7 @@ If `questPlan` is omitted, the component offers A1-A6. An empty `questSkills` li
 | `questTypes.ts` | Part 4-local plan, challenge, variant, and completion types |
 | `questData.ts` | Six skill templates and curated graph/task scenarios |
 | `Quests.test.tsx` | Component flow, plan filtering, confidence ordering, and completion tests |
+| `RepresentationViews.test.tsx` | Preference selection, narration, reading trace, and try-it interaction tests |
 | `questData.test.ts` | Skill coverage, distinct variants, and authored-answer checks |
 
 ## Running and testing
@@ -97,7 +98,7 @@ npx.cmd vitest run src/part4
 - Quest definitions and UI logic are separate: `questData.ts` supplies typed content, while `Quests.tsx` handles stage transitions and interactions.
 - Graphs and BFS algorithms are reused from Part 3 instead of being reimplemented.
 - Part 2 integration is a small callback and local type contract, avoiding a dependency on Part 2's internal state.
-- Tests check all six skills, multiple distinct variants per skill, valid answer keys, the full learner flow, and empty/restricted plans.
+- Tests check all six skills, multiple distinct variants per skill, valid answer keys, the full learner flow, empty/restricted plans, and the alternative representation modes.
 
 ## Instructional design notes
 
