@@ -82,6 +82,8 @@ All data is hard-coded in `SIMULATED_CLASS` inside `AppShell.tsx`. It is entirel
 |---|---|
 | `AppShell.tsx` | Seven-step shell, all embedded views, slides-to-video prototype, skill tree, report, and lecturer dashboard. |
 | `AppShell.css` | Layout and styling for the shell, sidebar, panels, video workflow, heatmap, and report. |
+| `AppShell.integration.test.tsx` | App navigation, diagnostic completion, and report-flow tests. |
+| `SkillTown.test.tsx` | Town summaries, building states, lit roads, progress, and persistence tests. |
 | `graph_overview.mp4` | Pre-generated BFS overview video. Bundled as a static asset and used as the simulated generation output. |
 | `README.md` | This file. |
 
@@ -118,6 +120,8 @@ Run Part 5-scoped checks:
 npx.cmd vitest run src/part5
 npx.cmd tsc --noEmit
 ```
+
+The app shell and skill-town behavior tests run as part of the Part 5 command. The broader test suite also covers the graph sandbox and alternative representation views.
 
 > **Windows PowerShell:** Use `npm.cmd` and `npx.cmd` instead of `npm` and `npx` if scripts are blocked.
 
