@@ -35,12 +35,15 @@ describe("Part 5 app shell", () => {
   it("navigates between the overview, sandbox, and lecturer dashboard", () => {
     render(<AppShell />);
 
+    expect(screen.getAllByRole("main")).toHaveLength(1);
     expect(screen.getByRole("heading", { name: "Turn your lecture slides into a video" })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /Sandbox/ }));
+    expect(screen.getAllByRole("main")).toHaveLength(1);
     expect(screen.getByText("Sandbox test surface")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /Lecturer dashboard/ }));
+    expect(screen.getAllByRole("main")).toHaveLength(1);
     expect(screen.getByRole("heading", { name: "Class skill heatmap" })).toBeTruthy();
     expect(screen.getByText(/SIMULATED CLASS DATA/)).toBeTruthy();
   });

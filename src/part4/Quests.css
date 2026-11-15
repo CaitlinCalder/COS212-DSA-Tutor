@@ -46,12 +46,12 @@
   padding: 0 0 14px;
 }
 
-.quests-header h1,
+.quests-header h2,
 .quest-title-row h2 {
   margin: 4px 0 8px;
 }
 
-.quests-header h1 {
+.quests-header h2 {
   font-size: clamp(23px, 2.3vw, 29px);
   line-height: 1.15;
 }
@@ -535,7 +535,7 @@
   gap: 14px;
 }
 
-.read-view h4 {
+.read-view h3 {
   font-size: 13px;
   margin: 0 0 6px;
 }

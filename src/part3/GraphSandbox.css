@@ -82,7 +82,7 @@
   letter-spacing: 1.1px;
 }
 
-.sandbox-header h1 {
+.sandbox-header h2 {
   margin: 2px 0;
   font-size: clamp(23px, 2.3vw, 29px);
   line-height: 1.15;

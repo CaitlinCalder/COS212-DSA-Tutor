@@ -259,10 +259,10 @@ export default function Quests({ questPlan = DEFAULT_PLAN, onQuestComplete }: Qu
 
   if (!selection || !quest || !currentVariant) {
     return (
-      <main className="quests-page">
-        <h1>Your quests</h1>
+      <section className="quests-page" aria-labelledby="quests-title">
+        <h2 id="quests-title">Your quests</h2>
         <p>There are no quests in your current learning plan.</p>
-      </main>
+      </section>
     );
   }
 
@@ -273,11 +273,11 @@ export default function Quests({ questPlan = DEFAULT_PLAN, onQuestComplete }: Qu
   const activeChallenge = stage === "guided" || stage === "independent" ? challenge : undefined;
 
   return (
-    <main className="quests-page">
+    <section className="quests-page" aria-labelledby="quests-title">
       <header className="quests-header">
         <div>
           <p className="quest-eyebrow">Restore the town network</p>
-          <h1>Your quests</h1>
+          <h2 id="quests-title">Your quests</h2>
           <p>Practise one skill at a time. Choose any available district, and take hints whenever you need them.</p>
         </div>
         <aside className="quest-progress" aria-live="polite">
@@ -546,6 +546,6 @@ export default function Quests({ questPlan = DEFAULT_PLAN, onQuestComplete }: Qu
           </div>
         </aside>
       </section>
-    </main>
+    </section>
   );
 }

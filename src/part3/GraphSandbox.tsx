@@ -532,7 +532,7 @@ export default function GraphSandbox({
   }
 
   return (
-    <main className="sandbox">
+    <section className="sandbox" aria-labelledby="sandbox-title">
       <div className="sandbox-shell">
         <header className="sandbox-header">
           <div className="sandbox-brand">
@@ -548,7 +548,7 @@ export default function GraphSandbox({
                 COS212 · INTERACTIVE LEARNING
               </span>
 
-              <h1>Graph Sandbox</h1>
+              <h2 id="sandbox-title">Graph Sandbox</h2>
 
               <p>
                 Restore the town network and explore
@@ -1337,6 +1337,6 @@ export default function GraphSandbox({
           </aside>
         </div>
       </div>
-    </main>
+    </section>
   );
 }

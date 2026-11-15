@@ -30,8 +30,12 @@ afterEach(() => {
 
 describe("Graph sandbox", () => {
   it("steps through BFS, updates the queue, and supports stepping backward", () => {
-    render(<GraphSandbox initialGraph={graph} />);
+    const { container } = render(<GraphSandbox initialGraph={graph} />);
 
+    expect(container.querySelector("main")).toBeNull();
+    expect(screen.getByRole("region", { name: "Graph Sandbox" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Graph Sandbox", level: 2 })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Try these in order", level: 3 })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Next Step" }));
     expect(screen.getByText("Town A joins the queue")).toBeTruthy();
     expect(within(screen.getByRole("list", { name: "BFS queue, front first" })).getByText("A")).toBeTruthy();

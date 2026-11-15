@@ -24,14 +24,17 @@ afterEach(() => {
 describe("Part 4 quest experience", () => {
   it("runs a quest through all three stages and emits tentative completion", () => {
     const onQuestComplete = vi.fn();
-    render(
+    const { container } = render(
       <Quests
         questPlan={{ questSkills: ["A3"] }}
         onQuestComplete={onQuestComplete}
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "The ticket line" })).toBeTruthy();
+    expect(container.querySelector("main")).toBeNull();
+    expect(screen.getByRole("region", { name: "Your quests" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Your quests", level: 2 })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "The ticket line", level: 2 })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Next example step" }));
     fireEvent.click(screen.getByRole("button", { name: "Next example step" }));
@@ -56,6 +59,15 @@ describe("Part 4 quest experience", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Try a fresh scenario" }));
     expect(screen.getByText("Scenario 2 of 2")).toBeTruthy();
+  });
+
+  it("uses a single-level heading hierarchy in the read view", () => {
+    render(<Quests questPlan={{ questSkills: ["A3"] }} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Reading it step by step/ }));
+
+    expect(screen.getByRole("heading", { name: "The ticket line", level: 2 })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "The network as a list", level: 3 })).toBeTruthy();
   });
 
   it("offers a confidence quest first and respects the parent's skill plan", () => {
@@ -94,8 +106,10 @@ describe("Part 4 quest experience", () => {
   });
 
   it("shows a clear empty state when the plan has no quests", () => {
-    render(<Quests questPlan={{ questSkills: [] }} />);
+    const { container } = render(<Quests questPlan={{ questSkills: [] }} />);
 
+    expect(container.querySelector("main")).toBeNull();
+    expect(screen.getByRole("heading", { name: "Your quests", level: 2 })).toBeTruthy();
     expect(screen.getByText(/There are no quests in your current learning plan/i)).toBeTruthy();
   });
 });

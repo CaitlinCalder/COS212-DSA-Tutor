@@ -137,7 +137,7 @@ export function ReadView({
   return (
     <div className="read-view">
       <section aria-labelledby="read-adjacency">
-        <h4 id="read-adjacency">The network as a list</h4>
+        <h3 id="read-adjacency">The network as a list</h3>
         <ul className="read-view__list">
           {graph.vertices.map((vertex) => (
             <li key={vertex}>
@@ -156,7 +156,7 @@ export function ReadView({
       {currentStep >= 0 && (
         <>
           <section aria-labelledby="read-trace">
-            <h4 id="read-trace">Step-by-step trace</h4>
+            <h3 id="read-trace">Step-by-step trace</h3>
             <div className="read-view__scroll">
               <table className="read-view__table">
                 <caption className="sr-only">BFS steps so far</caption>
@@ -185,7 +185,7 @@ export function ReadView({
           </section>
 
           <section aria-labelledby="read-pseudocode">
-            <h4 id="read-pseudocode">Pseudocode</h4>
+            <h3 id="read-pseudocode">Pseudocode</h3>
             <pre className="read-view__code" aria-label="BFS pseudocode">
               {BFS_PSEUDOCODE.map((line, index) => (
                 <span key={index} className={`read-view__line${index === activeLine ? " is-active" : ""}`}>
