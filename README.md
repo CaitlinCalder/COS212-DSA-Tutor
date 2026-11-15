@@ -28,14 +28,14 @@ The application also includes multiple learning representations (**Picture, List
 
 ## Technology Stack
 
-- **React** — User interface
-- **TypeScript** — Application logic and type safety
-- **Vite** — Development and build tooling
-- **CSS and SVG** — Styling and graph visualisations
-- **GSAP** — Interface animations
-- **Lucide React** — Interface icons
-- **Vitest and React Testing Library** — Automated testing
-- **GitHub Pages** — Deployment
+- **React** - User interface
+- **TypeScript** - Application logic and type safety
+- **Vite** - Development and build tooling
+- **CSS and SVG** - Styling and graph visualisations
+- **GSAP** - Interface animations
+- **Lucide React** - Interface icons
+- **Vitest and React Testing Library** - Automated testing
+- **GitHub Pages** - Deployment
 
 ## Getting Started
 
