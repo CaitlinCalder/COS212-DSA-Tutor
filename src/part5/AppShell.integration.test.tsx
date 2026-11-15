@@ -35,6 +35,11 @@ describe("Part 5 app shell", () => {
   it("navigates between the overview, sandbox, and lecturer dashboard", () => {
     render(<AppShell />);
 
+    const slideInput = screen.getByLabelText("Choose slides");
+    expect(slideInput.getAttribute("type")).toBe("file");
+    slideInput.focus();
+    expect(document.activeElement).toBe(slideInput);
+
     expect(screen.getAllByRole("main")).toHaveLength(1);
     expect(screen.getByRole("heading", { name: "Turn your lecture slides into a video" })).toBeTruthy();
 

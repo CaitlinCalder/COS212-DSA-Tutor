@@ -3,6 +3,10 @@
 :root { --navy:#102b46; --blue:#174d78; --ink:#17344f; --muted:#526b80; --line:#d8e4ee; --pale:#f3f8fc; --white:#fff; --gold:#d7a84b; }
 * { box-sizing:border-box; }
 .app-shell { min-height:100vh; display:flex; background:#f4f8fb; color:var(--ink); font-family:'DM Sans',sans-serif; }
+:where(.app-shell) :is(button,input,select,summary,a):focus-visible { outline:3px solid #174d78; outline-offset:3px; }
+.sidebar :is(.step-link,.lecturer-link):focus-visible { outline-color:#ffca20; }
+.sidebar :is(.step-link.active,.lecturer-link.active):focus-visible { outline-color:#174d78; }
+.slide-browse:focus-within { outline:3px solid #174d78; outline-offset:3px; }
 .sidebar { width:272px; flex:0 0 272px; background:#102b46; color:#fff; padding:27px 17px 20px; display:flex; flex-direction:column; min-height:100vh; }
 .brand { display:flex; align-items:center; gap:12px; padding:0 9px 34px; }
 .brand-icon { width:43px; height:43px; display:grid; place-items:center; border-radius:13px; background:#e4eff8; color:#123c61; font:800 13px Manrope,sans-serif; letter-spacing:.5px; }
